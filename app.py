@@ -10,7 +10,7 @@ app.secret_key = "secret123"
 
 # ---------- DATABASE CONNECTION ----------
 def get_db():
-    return psycopg2.connect(os.environ.get("postgresql://trackhire_db_user:lQwGCiH0m0eMTAvsd4z9saz0Zlqlidko@dpg-d7e935a8qa3s73bqvru0-a/trackhire_db"))
+    return psycopg2.connect(os.environ.get("postgresql://trackhire_db_user:lQwGCiH0m0eMTAvsd4z9saz0Zlqlidko@dpg-d7e935a8qa3s73bqvru0-a.ohio-postgres.render.com/trackhire_db"))
 
 # ---------- HOME ----------
 @app.route('/')
