@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
-import mysql.connector
+import psycopg2
+import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import flash
 import os
@@ -9,12 +10,7 @@ app.secret_key = "secret123"
 
 # ---------- DATABASE CONNECTION ----------
 def get_db():
-    return mysql.connector.connect(
-        host=os.environ.get("DB_HOST", "localhost"),
-        user=os.environ.get("DB_USER", "root"),
-        password=os.environ.get("DB_PASSWORD", "Harshu@1001"),
-        database=os.environ.get("DB_NAME", "job_tracker")
-    )
+    return psycopg2.connect(os.environ.get("postgresql://trackhire_db_user:lQwGCiH0m0eMTAvsd4z9saz0Zlqlidko@dpg-d7e935a8qa3s73bqvru0-a/trackhire_db"))
 
 # ---------- HOME ----------
 @app.route('/')
@@ -23,7 +19,7 @@ def index():
         return redirect('/login')
 
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Get search inputs
     search = request.args.get('search', '')
@@ -122,7 +118,7 @@ def edit_job(id):
         return redirect('/login')
     
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # ALWAYS fetch job first (for both GET & POST)
     cursor.execute("SELECT * FROM jobs WHERE id=%s", (id,))
@@ -210,7 +206,7 @@ def register():
 def login():
     if request.method == 'POST':
         conn = get_db()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         email = request.form['email']
         password = request.form['password']
