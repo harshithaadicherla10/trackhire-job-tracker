@@ -182,15 +182,24 @@ def delete_job(id):
 def register():
     if request.method == 'POST':
         conn = get_db()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         username = request.form['username']
         email = request.form['email']
         password = generate_password_hash(request.form['password'])
 
+        # 🔥 CHECK IF FIRST USER
+        cursor.execute("SELECT COUNT(*) FROM users")
+        count = cursor.fetchone()[0]
+
+        if count == 0:
+            role = "admin"
+        else:
+            role = "user"
+
         cursor.execute(
             "INSERT INTO users (username, email, password, role) VALUES (%s, %s, %s, %s)",
-            (username, email, password, "user")
+            (username, email, password, role)
         )
 
         conn.commit()
